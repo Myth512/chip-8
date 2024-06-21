@@ -1,1 +1,1 @@
-Simple CHIP8 emulator/interpreter
+Simple CHIP-8 emulator/interpreter
