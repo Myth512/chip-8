@@ -58,7 +58,11 @@ void process_input(bool *state) {
 	return;
 }
 
-void update(){
+void update(Memory *memory){
+	u8 current_instruction[INSTRUCTION_SIZE];
+	instruction_fetch(memory, current_instruction);
+	printf("%x", current_instruction[0]);
+	printf("%x\n", current_instruction[1]);
 	return;
 }
 void render(Memory *memory, SDL_Renderer *renderer){
@@ -83,10 +87,11 @@ int main(int argc, char *argv[]){
 	bool state = false;
 
 	setup(&memory, &window, &renderer, &state);	
+	rom_read(argc, argv, &memory, &state);
 
 	while(state){
 		process_input(&state);
-		update();
+		update(&memory);
 		render(&memory, renderer);
 	}
 

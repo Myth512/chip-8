@@ -5,3 +5,4 @@
 #include "types.h"
 #include "memory.h"
 #include "constants.h"
+#include "instructions.h"

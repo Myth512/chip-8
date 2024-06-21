@@ -2,6 +2,7 @@
 #define MEMORY
 
 #include "types.h"
+#include <stdbool.h>
 
 typedef struct Memory{
 	u8 RAM[4096];
@@ -14,5 +15,7 @@ typedef struct Memory{
 } Memory;
 
 void Memory_initialize(Memory *memory);
+
+void rom_read(int argc, char *argv[], Memory *memory, bool *state);
 
 #endif
