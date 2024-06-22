@@ -1,5 +1,10 @@
+#ifndef CONSTANT
+#define CONSTANT
+	
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 640
 #define SCALE 20
 #define BASE_ADDRESS 0x200
 #define INSTRUCTION_SIZE 2
+
+#endif

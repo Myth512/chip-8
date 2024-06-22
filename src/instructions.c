@@ -1,18 +1,20 @@
 #include "../include/instructions.h"
 
-void instruction_fetch(Memory *memory, u16 instruction){
-	memcpy(instruction, memory->RAM[memory->PC], INSTRUCTION_SIZE);
-	return;
+u16 instruction_fetch(Memory *memory) {
+	u16 instruction = 0xffff;
+	memcpy(&instruction, memory->RAM + memory->PC, INSTRUCTION_SIZE);
+	return instruction;
 }
 
 void instruction_decode(u16 instruction){
-	u8 first_nibble = instruction >> 12;
-	u8 second_nibble =(instruction >> 8) & 0b1111;
-	u8 third_nibble = (instruction >> 4) & 0b1111;
-	u8 last_nibble = instruciton & 0b1111;
+	u8 first_nibble = (instruction >> 4) & 0b1111;
+	u8 second_nibble = instruction & 0b1111;
+	u8 third_nibble = instruction >> 12;
+	u8 fourth_nibble = (instruction >> 8) & 0b1111;
+
 	switch(first_nibble){
 		case 0x0:
-			switch(last_nibble){
+			switch(fourth_nibble){
 				case 0x0:
 					instruction_clean();
 					break;
@@ -42,7 +44,7 @@ void instruction_decode(u16 instruction){
 			instruction_add_reg_const();
 			break;
 		case 0x8:
-			switch(last_nibble){
+			switch(fourth_nibble){
 				case 0x0:
 					instruction_set_reg_reg();
 					break;
@@ -53,7 +55,7 @@ void instruction_decode(u16 instruction){
 					instruction_and_reg_reg();
 					break;
 				case 0x3:
-					instruction_xor_reg_reg():
+					instruction_xor_reg_reg();
 					break;
 				case 0x4:
 					instruction_add_reg_reg();
@@ -62,13 +64,13 @@ void instruction_decode(u16 instruction){
 					instruction_sub_reg_reg();
 					break;
 				case 0x6:
-					instruction_right_shift();
+					instruction_shift_right();
 					break;
 				case 0x7:
 					instruction_subn_reg_reg();
 					break;
 				case 0xE:
-					instruction_left_shift();
+					instruction_shift_left();
 					break;
 			}
 			break;
@@ -82,13 +84,13 @@ void instruction_decode(u16 instruction){
 			instruction_jump_V0();
 			break;
 		 case 0xC:
-			instruction_rand();
+			instruction_random();
 			break;
 		case 0xD:
 			instruction_draw();
 			break;
 		case 0xE:
-			switch(last_nibble){
+			switch(fourth_nibble){
 				case 0xE:
 					instruction_skip_key_pressed();
 					break;
@@ -98,7 +100,7 @@ void instruction_decode(u16 instruction){
 			}
 			break;
 		case 0xF:
-			switch(last_nibble){
+			switch(fourth_nibble){
 				case 0x3:
 					instruction_store_BCD();
 					break;
@@ -133,5 +135,141 @@ void instruction_decode(u16 instruction){
 			}
 			break;
 	}		
+	return;
+}
+
+void instruction_clean() {
+	return;
+}
+
+void instruction_return() {
+	return;
+}
+
+void instruction_jump() {
+	return;
+}
+
+void instruction_call() {
+	return;
+}
+
+void instruction_skip_equal_const() {
+	return;
+}
+
+void instruction_skip_not_equal_const() {
+	return;
+}
+
+void instruction_skip_equal_reg() {
+	return;
+}
+
+void instruction_set_reg_const() {
+	return;
+}
+
+void instruction_add_reg_const() {
+	return;
+}
+
+void instruction_set_reg_reg() {
+	return;
+}
+
+void instruction_or_reg_reg() {
+	return;
+}
+
+void instruction_and_reg_reg() {
+	return;
+}
+
+void instruction_xor_reg_reg() {
+	return;
+}
+
+void instruction_add_reg_reg() {
+	return;
+}
+
+void instruction_sub_reg_reg() {
+	return;
+}
+
+void instruction_shift_right() {
+	return;
+}
+
+void instruction_subn_reg_reg() {
+	return;
+}
+
+void instruction_shift_left() {
+	return;
+}
+
+void instruction_skip_not_equal_reg() {
+	return;
+}
+
+void instruction_set_I_const() {
+	return;
+}
+
+void instruction_jump_V0() {
+	return;
+}
+
+void instruction_random() {
+	return;
+}
+
+void instruction_draw() {
+	return;
+}
+
+void instruction_skip_key_pressed() {
+	return;
+}
+
+void instruction_skip_key_not_pressed() {
+	return;
+}
+
+void instruction_store_BCD() {
+	return;
+}
+
+void instruction_set_DT_reg() {
+	return;
+}
+
+void instruction_store_regs() {
+	return;
+}
+
+void instruction_read_regs() {
+	return;
+}
+
+void instruction_set_reg_DT() {
+	return;
+}
+
+void instruction_set_ST_reg() {
+	return;
+}
+
+void instruction_set_I_reg() {
+	return;
+}
+
+void instruction_wait_for_key() {
+	return;
+}
+
+ void instruction_add_I_reg() {
 	return;
 }

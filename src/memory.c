@@ -1,6 +1,4 @@
 #include "../include/memory.h"
-#include "../include/constants.h"
-#include <stdio.h>
 
 void Memory_initialize(Memory *memory){
 	for (u16 i = 0; i < 4096; i++)

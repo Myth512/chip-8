@@ -1,8 +1,10 @@
 #ifndef MEMORY
 #define MEMORY
 
-#include "types.h"
 #include <stdbool.h>
+#include <stdio.h>
+#include "types.h"
+#include "constants.h"
 
 typedef struct Memory{
 	u8 RAM[4096];
