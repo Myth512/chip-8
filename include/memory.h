@@ -3,8 +3,11 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 #include "types.h"
 #include "constants.h"
+
+extern const u8 font[80];
 
 typedef struct Memory{
 	u8 RAM[4096];
@@ -16,8 +19,8 @@ typedef struct Memory{
 	u8 V[16];
 } Memory;
 
-void Memory_initialize(Memory *memory);
+void memory_initialize(Memory *memory);
 
-void rom_read(int argc, char *argv[], Memory *memory, bool *state);
+void memory_rom_read(int argc, char *argv[], Memory *memory, bool *state);
 
 #endif

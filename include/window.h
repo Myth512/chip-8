@@ -10,10 +10,12 @@ bool window_initialize(SDL_Window **window, SDL_Renderer **renderer);
 
 void window_destroy(SDL_Window *window, SDL_Renderer *renderer);
 
-void process_input(bool *state);
+void window_process_input(bool *state);
 
-void render(Memory *memory, SDL_Renderer *renderer);
+void window_render(Memory *memory, SDL_Renderer *renderer);
 
-void setup(Memory *memory, SDL_Window **window, SDL_Renderer **renderer, bool *state);
+void window_clear(SDL_Renderer *renderer);
+
+void window_setup(Memory *memory, SDL_Window **window, SDL_Renderer **renderer, bool *state);
 
 #endif

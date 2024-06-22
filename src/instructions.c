@@ -6,24 +6,26 @@ u16 instruction_fetch(Memory *memory) {
 	return instruction;
 }
 
-void instruction_decode(u16 instruction){
+void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer, bool *state){
 	u8 first_nibble = (instruction >> 4) & 0b1111;
 	u8 second_nibble = instruction & 0b1111;
 	u8 third_nibble = instruction >> 12;
 	u8 fourth_nibble = (instruction >> 8) & 0b1111;
 
+    if (!instruction) return;
+
 	switch(first_nibble){
 		case 0x0:
 			switch(fourth_nibble){
 				case 0x0:
-					instruction_clean();
+					instruction_clean(memory, renderer);
 					break;
 				case 0xE:
 					instruction_return();
 			}
 			break;
 		case 0x1:
-			instruction_jump();
+			instruction_jump(memory, instruction);
 			break;
 		case 0x2:
 			instruction_call();
@@ -37,12 +39,14 @@ void instruction_decode(u16 instruction){
 		case 0x5:
 			instruction_skip_equal_reg();
 			break;
-		case 0x6:
-			instruction_set_reg_const();
-			break;
-		case 0x7:
-			instruction_add_reg_const();
-			break;
+		case 0x6: {
+            u8 value = third_nibble << 4 | fourth_nibble;
+			instruction_set_reg_const(memory, second_nibble, value);
+			break; }
+		case 0x7: {
+            u8 value = third_nibble << 4 | fourth_nibble;
+			instruction_add_reg_const(memory, second_nibble, value);
+			break; } 
 		case 0x8:
 			switch(fourth_nibble){
 				case 0x0:
@@ -78,7 +82,7 @@ void instruction_decode(u16 instruction){
 			instruction_skip_not_equal_reg();
 			break;
 		case 0xA:
-			instruction_set_I_const();
+			instruction_set_I_const(memory, instruction);
 			break;
 		case 0xB:
 			instruction_jump_V0();
@@ -138,7 +142,14 @@ void instruction_decode(u16 instruction){
 	return;
 }
 
-void instruction_clean() {
+void instruction_clean(Memory *memory, SDL_Renderer *renderer) {
+    for (u8 y = 0; y < 32; y++) {
+        for (u8 x = 0; x < 64; x++)
+            memory->screen[y][x] = 0;
+    }
+    window_clear(renderer);
+
+    memory->PC += 2;
 	return;
 }
 
@@ -146,8 +157,10 @@ void instruction_return() {
 	return;
 }
 
-void instruction_jump() {
-	return;
+void instruction_jump(Memory *memory, u16 raw_address) { 
+    u16 address = (raw_address << 8 | raw_address >> 8) & 0xfff;
+    memory->PC = address;
+    return;
 }
 
 void instruction_call() {
@@ -166,11 +179,17 @@ void instruction_skip_equal_reg() {
 	return;
 }
 
-void instruction_set_reg_const() {
+void instruction_set_reg_const(Memory *memory, u8 index, u8 value) {
+    memory->V[index] = value;
+
+    memory->PC += 2;
 	return;
 }
 
-void instruction_add_reg_const() {
+void instruction_add_reg_const(Memory *memory, u8 index, u8 value) {
+    memory->V[index] += value;
+
+    memory->PC += 2;
 	return;
 }
 
@@ -214,7 +233,9 @@ void instruction_skip_not_equal_reg() {
 	return;
 }
 
-void instruction_set_I_const() {
+void instruction_set_I_const(Memory *memory, u16 raw_value) {
+    u16 value = (raw_value << 8 | raw_value >> 8) & 0xfff;
+    memory->I = value;
 	return;
 }
 
