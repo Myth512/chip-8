@@ -9,9 +9,6 @@ int main(int argc, char *argv[]) {
     window_setup(&memory, &window, &renderer, &state);	
     memory_rom_read(argc, argv, &memory, &state);
 
-    for (int i = 0; i < 4096; i++)
-        printf("%x ", memory.RAM[i]);
-    
     while(state){
         window_process_input(&state);
 

@@ -91,7 +91,7 @@ void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer,
 			instruction_random();
 			break;
 		case 0xD:
-			instruction_draw();
+			instruction_draw_sprite(memory, renderer, second_nibble, third_nibble, fourth_nibble);
 			break;
 		case 0xE:
 			switch(fourth_nibble){
@@ -236,6 +236,8 @@ void instruction_skip_not_equal_reg() {
 void instruction_set_I_const(Memory *memory, u16 raw_value) {
     u16 value = (raw_value << 8 | raw_value >> 8) & 0xfff;
     memory->I = value;
+    
+    memory->PC += 2;
 	return;
 }
 
@@ -247,7 +249,23 @@ void instruction_random() {
 	return;
 }
 
-void instruction_draw() {
+void instruction_draw_sprite(Memory *memory, SDL_Renderer *renderer, u8 index_x, u8 index_y, u8 height) {
+    u8 origin_x = memory->V[index_x];
+    u8 origin_y = memory->V[index_y];
+    memory->V[15] = 0;
+    for (u8 y = 0; y < height; y++){
+        for (u8 x = 0; x < 8; x++){
+            u8 real_x = (origin_x + x) & 63;
+            u8 real_y = (origin_y + y) & 31;
+            u8 *screen_pixel = &memory->screen[real_y][real_x];
+            u8 sprite_pixel = (bool)(memory->RAM[memory->I + y] & (128 >> x));
+            memory->V[15] |= *screen_pixel & sprite_pixel;
+            *screen_pixel ^= sprite_pixel;
+        }
+    }
+    window_draw_sprite(memory, renderer, origin_x, origin_y, height);
+
+    memory->PC += 2;
 	return;
 }
 

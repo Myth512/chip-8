@@ -57,7 +57,7 @@ void instruction_jump_V0();
 
 void instruction_random();
 
-void instruction_draw();
+void instruction_draw_sprite(Memory *memory, SDL_Renderer *rendere, u8 index_x, u8 index_y, u8 height);
 
 void instruction_skip_key_pressed();
 

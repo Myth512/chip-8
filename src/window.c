@@ -52,21 +52,25 @@ void window_process_input(bool *state) {
 	return;
 }
 
-void window_render(Memory *memory, SDL_Renderer *renderer){
-	SDL_RenderClear(renderer);
-	for (u8 y = 0; y < 32; y++){
-		for (u8 x = 0; x < 64; x++){
-			if (memory->screen[y][x])
+void window_draw_sprite(Memory *memory, SDL_Renderer *renderer, u8 origin_x, u8 origin_y, u8 height){
+    for (u8 y = 0; y < height; y++){
+        for (u8 x = 0; x < 8; x++){
+            u8 real_x = (origin_x + x) & 63;
+            u8 real_y = (origin_y + y) & 31;
+
+			if (memory->screen[real_y][real_x])
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 			else
 				SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-			SDL_Rect pixel = {x * SCALE, y * SCALE, SCALE, SCALE};
+
+			SDL_Rect pixel = {real_x * SCALE, real_y * SCALE, SCALE, SCALE};
 			SDL_RenderFillRect(renderer, &pixel);
 		}
 	}
 	SDL_RenderPresent(renderer);
+    return;
 }
-
+    
 void window_clear(SDL_Renderer *renderer) {
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -80,6 +84,6 @@ void window_setup(Memory *memory, SDL_Window **window, SDL_Renderer **renderer, 
 	memory_initialize(memory);
 	*state = window_initialize(window, renderer);
 	if (state)
-		window_render(memory, *renderer);
+		window_clear(*renderer);
 	return;
 }
