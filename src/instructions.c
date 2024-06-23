@@ -12,6 +12,8 @@ void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer,
 	u8 third_nibble = instruction >> 12;
 	u8 fourth_nibble = (instruction >> 8) & 0b1111;
 
+    u8 second_byte = instruction >> 8;
+
     if (!instruction) return;
 
 	switch(first_nibble){
@@ -21,74 +23,73 @@ void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer,
 					instruction_clean(memory, renderer);
 					break;
 				case 0xE:
-					instruction_return();
+					instruction_return(memory);
+                    break;
 			}
 			break;
 		case 0x1:
 			instruction_jump(memory, instruction);
 			break;
 		case 0x2:
-			instruction_call();
+			instruction_call(memory, instruction);
 			break;
-		case 0x3:
-			instruction_skip_equal_const();
+		case 0x3: 
+			instruction_skip_equal_const(memory, second_nibble, second_byte);
 			break;
 		case 0x4:
-			instruction_skip_not_equal_const();
+			instruction_skip_not_equal_const(memory, second_nibble, second_byte);
 			break;
 		case 0x5:
-			instruction_skip_equal_reg();
+			instruction_skip_equal_reg(memory, second_nibble, third_nibble);
 			break;
-		case 0x6: {
-            u8 value = third_nibble << 4 | fourth_nibble;
-			instruction_set_reg_const(memory, second_nibble, value);
-			break; }
-		case 0x7: {
-            u8 value = third_nibble << 4 | fourth_nibble;
-			instruction_add_reg_const(memory, second_nibble, value);
-			break; } 
+		case 0x6: 
+			instruction_set_reg_const(memory, second_nibble, second_byte);
+			break;
+		case 0x7:
+			instruction_add_reg_const(memory, second_nibble, second_byte);
+			break; 
 		case 0x8:
 			switch(fourth_nibble){
 				case 0x0:
-					instruction_set_reg_reg();
+					instruction_set_reg_reg(memory, second_nibble, third_nibble);
 					break;
 				case 0x1:
-					instruction_or_reg_reg();
+					instruction_or_reg_reg(memory, second_nibble, third_nibble);
 					break;
 				case 0x2:
-					instruction_and_reg_reg();
+					instruction_and_reg_reg(memory, second_nibble, third_nibble);
 					break;
 				case 0x3:
-					instruction_xor_reg_reg();
+					instruction_xor_reg_reg(memory, second_nibble, third_nibble);
 					break;
 				case 0x4:
-					instruction_add_reg_reg();
+					instruction_add_reg_reg(memory, second_nibble, third_nibble);
 					break;
 				case 0x5:
-					instruction_sub_reg_reg();
+					instruction_sub_reg_reg(memory, second_nibble, third_nibble);
 					break;
 				case 0x6:
-					instruction_shift_right();
+					instruction_shift_right(memory, second_nibble);
 					break;
 				case 0x7:
-					instruction_subn_reg_reg();
+					instruction_subn_reg_reg(memory, second_nibble, third_nibble);
 					break;
 				case 0xE:
-					instruction_shift_left();
+					instruction_shift_left(memory, second_nibble);
 					break;
 			}
 			break;
 		case 0x9:
-			instruction_skip_not_equal_reg();
+			instruction_skip_not_equal_reg(memory, second_nibble, third_nibble);
 			break;
 		case 0xA:
 			instruction_set_I_const(memory, instruction);
 			break;
 		case 0xB:
-			instruction_jump_V0();
+			instruction_jump_offset(memory, instruction);
 			break;
 		 case 0xC:
-			instruction_random();
+			instruction_random(memory, second_nibble, second_byte);
 			break;
 		case 0xD:
 			instruction_draw_sprite(memory, renderer, second_nibble, third_nibble, fourth_nibble);
@@ -148,12 +149,12 @@ void instruction_clean(Memory *memory, SDL_Renderer *renderer) {
             memory->screen[y][x] = 0;
     }
     window_clear(renderer);
-
     memory->PC += 2;
 	return;
 }
 
-void instruction_return() {
+void instruction_return(Memory *memory) {
+    memory->PC = stack_pop(&memory->stack);
 	return;
 }
 
@@ -163,89 +164,128 @@ void instruction_jump(Memory *memory, u16 raw_address) {
     return;
 }
 
-void instruction_call() {
+void instruction_call(Memory *memory, u16 raw_address) {
+    u16 address = (raw_address << 8 | raw_address >> 8) & 0xfff;
+    stack_push(&memory->stack, memory->PC);
+    memory->PC = address;
 	return;
 }
 
-void instruction_skip_equal_const() {
+void instruction_skip_equal_const(Memory *memory, u8 index, u8 value) {
+    if (memory->V[index] == value)
+        memory->PC += 2;
+    memory->PC += 2;
 	return;
 }
 
-void instruction_skip_not_equal_const() {
+void instruction_skip_not_equal_const(Memory *memory, u8 index, u8 value) {
+    if (memory->V[index] != value)
+        memory->PC += 2;
+    memory->PC += 2;
 	return;
 }
 
-void instruction_skip_equal_reg() {
+void instruction_skip_equal_reg(Memory *memory, u8 index_x, u8 index_y) {
+    if (memory->V[index_x] == memory->V[index_y])
+        memory->PC += 2;
+    memory->PC += 2;
 	return;
 }
 
 void instruction_set_reg_const(Memory *memory, u8 index, u8 value) {
     memory->V[index] = value;
-
     memory->PC += 2;
 	return;
 }
 
 void instruction_add_reg_const(Memory *memory, u8 index, u8 value) {
     memory->V[index] += value;
-
     memory->PC += 2;
 	return;
 }
 
-void instruction_set_reg_reg() {
+void instruction_set_reg_reg(Memory *memory, u8 index_x, u8 index_y) {
+    memory->V[index_x] = memory->V[index_y];
+    memory->PC += 2;
 	return;
 }
 
-void instruction_or_reg_reg() {
+void instruction_or_reg_reg(Memory *memory, u8 index_x, u8 index_y) {
+    memory->V[index_x] |= memory->V[index_y];
+    memory->PC += 2;
 	return;
 }
 
-void instruction_and_reg_reg() {
+void instruction_and_reg_reg(Memory *memory, u8 index_x, u8 index_y) {
+    memory->V[index_x] &= memory->V[index_y];
+    memory->PC += 2;
 	return;
 }
 
-void instruction_xor_reg_reg() {
+void instruction_xor_reg_reg(Memory *memory, u8 index_x, u8 index_y) {
+    memory->V[index_x] ^= memory->V[index_y];
+    memory->PC += 2;
 	return;
 }
 
-void instruction_add_reg_reg() {
+void instruction_add_reg_reg(Memory *memory, u8 index_x, u8 index_y) {
+    memory->V[index_x] += memory->V[index_y];
+    memory->V[15] = memory->V[index_x] + memory->V[index_y] > 255;
+    memory->PC += 2;
 	return;
 }
 
-void instruction_sub_reg_reg() {
+void instruction_sub_reg_reg(Memory *memory, u8 index_x, u8 index_y) {
+    memory->V[index_x] -= memory->V[index_y];
+    memory->V[15] = memory->V[index_x] > memory->V[index_y];
+    memory->PC += 2;
 	return;
 }
 
-void instruction_shift_right() {
+void instruction_shift_right(Memory *memory, u8 index) {
+    memory->V[15] = memory->V[index] & 1;
+    memory->V[index] >>= 1;
+    memory->PC += 2;
 	return;
 }
 
-void instruction_subn_reg_reg() {
+void instruction_subn_reg_reg(Memory *memory, u8 index_x, u8 index_y) {
+    memory->V[index_x] = memory->V[index_y] - memory->V[index_x];
+    memory->V[15] = memory->V[index_y] > memory->V[index_x];
+    memory->PC += 2;
 	return;
 }
 
-void instruction_shift_left() {
+void instruction_shift_left(Memory *memory, u8 index) {
+    memory->V[15] = memory->V[index] & 128;
+    memory->V[index] <<= 1;
+    memory->PC += 2;
 	return;
 }
 
-void instruction_skip_not_equal_reg() {
+void instruction_skip_not_equal_reg(Memory *memory, u8 index_x, u8 index_y) {
+    if (memory->V[index_x] != memory->V[index_y])
+        memory->PC += 2;
+    memory->PC += 2;
 	return;
 }
 
 void instruction_set_I_const(Memory *memory, u16 raw_value) {
     u16 value = (raw_value << 8 | raw_value >> 8) & 0xfff;
     memory->I = value;
-    
     memory->PC += 2;
 	return;
 }
 
-void instruction_jump_V0() {
+void instruction_jump_offset(Memory *memory, u16 raw_address) {
+    u16 address = ((raw_address << 8 | raw_address >> 8) & 0xfff) + memory->V[0];
+    memory->PC = address;
 	return;
 }
 
-void instruction_random() {
+void instruction_random(Memory *memory, u8 index, u8 value) {
+    memory->V[index] = rand() & value;
+    memory->PC += 2;
 	return;
 }
 
@@ -264,7 +304,6 @@ void instruction_draw_sprite(Memory *memory, SDL_Renderer *renderer, u8 index_x,
         }
     }
     window_draw_sprite(memory, renderer, origin_x, origin_y, height);
-
     memory->PC += 2;
 	return;
 }
@@ -311,4 +350,12 @@ void instruction_wait_for_key() {
 
  void instruction_add_I_reg() {
 	return;
+}
+
+void instruction_update_timers(Memory *memory){
+    if (memory->DT)
+        memory->DT--;
+    if (memory->ST)
+        memory->ST--;
+    return;
 }

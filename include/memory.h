@@ -6,6 +6,7 @@
 #include <string.h>
 #include "types.h"
 #include "constants.h"
+#include "stack.h"
 
 extern const u8 font[80];
 
@@ -17,6 +18,7 @@ typedef struct Memory{
 	u8 DT;
 	u8 ST;
 	u8 V[16];
+    Stack stack; 
 } Memory;
 
 void memory_initialize(Memory *memory);

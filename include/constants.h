@@ -6,5 +6,6 @@
 #define SCALE 20
 #define BASE_ADDRESS 0x200
 #define INSTRUCTION_SIZE 2
+#define STACK_SIZE 128
 
 #endif

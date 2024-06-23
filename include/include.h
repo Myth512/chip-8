@@ -7,3 +7,4 @@
 #include "constants.h"
 #include "instructions.h"
 #include "window.h"
+#include "stack.h"
