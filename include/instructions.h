@@ -61,27 +61,27 @@ void instruction_random(Memory *memory, u8 index, u8 value);
 
 void instruction_draw_sprite(Memory *memory, SDL_Renderer *rendere, u8 index_x, u8 index_y, u8 height);
 
-void instruction_skip_key_pressed();
+void instruction_skip_key_pressed(Memory *memory, u8 index);
 
-void instruction_skip_key_not_pressed();
+void instruction_skip_key_not_pressed(Memory *memory, u8 index);
 
-void instruction_store_BCD();
+void instruction_store_BCD(Memory *memory, u8 index);
 
-void instruction_set_DT_reg();
+void instruction_set_DT_reg(Memory *memory, u8 index);
 
-void instruction_store_regs();
+void instruction_store_regs(Memory *memory, u8 index);
 
-void instruction_read_regs();
+void instruction_read_regs(Memory *memory, u8 index);
 
-void instruction_set_reg_DT();
+void instruction_set_reg_DT(Memory *memory, u8 index);
 
-void instruction_set_ST_reg();
+void instruction_set_ST_reg(Memory *memory, u8 index);
 
-void instruction_set_I_reg();
+void instruction_set_I_reg(Memory *memory, u8 index);
 
-void instruction_wait_for_key();
+void instruction_wait_for_key(Memory *memory, u8 index);
 
-void instruction_add_I_reg();
+void instruction_add_I_reg(Memory *memory, u8 index);
 
 void instruction_update_timers(Memory *memory);
 #endif

@@ -18,4 +18,6 @@ void window_clear(SDL_Renderer *renderer);
 
 void window_setup(Memory *memory, SDL_Window **window, SDL_Renderer **renderer, bool *state);
 
+u8 window_translate_key(SDL_Event *event);
+
 #endif

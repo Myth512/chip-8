@@ -1,18 +1,19 @@
 #include "../include/instructions.h"
 
 u16 instruction_fetch(Memory *memory) {
-	u16 instruction = 0xffff;
+	u16 instruction;
 	memcpy(&instruction, memory->RAM + memory->PC, INSTRUCTION_SIZE);
+    instruction = (instruction << 8 | instruction >> 8);
 	return instruction;
 }
 
 void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer, bool *state){
-	u8 first_nibble = (instruction >> 4) & 0b1111;
-	u8 second_nibble = instruction & 0b1111;
-	u8 third_nibble = instruction >> 12;
-	u8 fourth_nibble = (instruction >> 8) & 0b1111;
+	u8 first_nibble = instruction >> 12; 
+	u8 second_nibble = (instruction >> 8) & 0b1111;
+	u8 third_nibble = (instruction >> 4) & 0b1111;
+	u8 fourth_nibble = instruction & 0b1111;
 
-    u8 second_byte = instruction >> 8;
+    u8 second_byte = instruction & 0xffff;
 
     if (!instruction) return;
 
@@ -97,45 +98,45 @@ void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer,
 		case 0xE:
 			switch(fourth_nibble){
 				case 0xE:
-					instruction_skip_key_pressed();
+					instruction_skip_key_pressed(memory, second_nibble);
 					break;
 				case 0x1:
-					instruction_skip_key_not_pressed();
+					instruction_skip_key_not_pressed(memory, second_nibble);
 					break;
 			}
 			break;
 		case 0xF:
 			switch(fourth_nibble){
 				case 0x3:
-					instruction_store_BCD();
+					instruction_store_BCD(memory, second_nibble);
 					break;
 				case 0x5:
 					switch(third_nibble){
 						case 0x1:
-							instruction_set_DT_reg();
+							instruction_set_DT_reg(memory, second_nibble);
 							break;
 						case 0x5:
-							instruction_store_regs();
+							instruction_store_regs(memory, second_nibble);
 							break;
 						case 0x6:
-							instruction_read_regs();
+							instruction_read_regs(memory, second_nibble);
 							break;
 					}
 					break;
 				case 0x7:
-					instruction_set_reg_DT();
+					instruction_set_reg_DT(memory, second_nibble);
 					break;
 				case 0x8:
-					instruction_set_ST_reg();
+					instruction_set_ST_reg(memory, second_nibble);
 					break;
 				case 0x9:
-					instruction_set_I_reg();
+					instruction_set_I_reg(memory, second_nibble);
 					break;
 				case 0xA:
-					instruction_wait_for_key();
+					instruction_wait_for_key(memory, second_nibble);
 					break;
 				case 0xE:
-					instruction_add_I_reg();
+					instruction_add_I_reg(memory, second_nibble);
 					break;
 			}
 			break;
@@ -154,18 +155,18 @@ void instruction_clean(Memory *memory, SDL_Renderer *renderer) {
 }
 
 void instruction_return(Memory *memory) {
-    memory->PC = stack_pop(&memory->stack);
+    memory->PC = stack_pop(&memory->stack) + 2;
 	return;
 }
 
 void instruction_jump(Memory *memory, u16 raw_address) { 
-    u16 address = (raw_address << 8 | raw_address >> 8) & 0xfff;
+    u16 address = raw_address & 0xfff;
     memory->PC = address;
     return;
 }
 
 void instruction_call(Memory *memory, u16 raw_address) {
-    u16 address = (raw_address << 8 | raw_address >> 8) & 0xfff;
+    u16 address = raw_address & 0xfff;
     stack_push(&memory->stack, memory->PC);
     memory->PC = address;
 	return;
@@ -237,7 +238,7 @@ void instruction_add_reg_reg(Memory *memory, u8 index_x, u8 index_y) {
 
 void instruction_sub_reg_reg(Memory *memory, u8 index_x, u8 index_y) {
     memory->V[index_x] -= memory->V[index_y];
-    memory->V[15] = memory->V[index_x] > memory->V[index_y];
+    memory->V[15] = memory->V[index_x] < memory->V[index_y];
     memory->PC += 2;
 	return;
 }
@@ -257,7 +258,7 @@ void instruction_subn_reg_reg(Memory *memory, u8 index_x, u8 index_y) {
 }
 
 void instruction_shift_left(Memory *memory, u8 index) {
-    memory->V[15] = memory->V[index] & 128;
+    memory->V[15] = (bool)(memory->V[index] & 128);
     memory->V[index] <<= 1;
     memory->PC += 2;
 	return;
@@ -271,14 +272,14 @@ void instruction_skip_not_equal_reg(Memory *memory, u8 index_x, u8 index_y) {
 }
 
 void instruction_set_I_const(Memory *memory, u16 raw_value) {
-    u16 value = (raw_value << 8 | raw_value >> 8) & 0xfff;
+    u16 value = raw_value & 0xfff;
     memory->I = value;
     memory->PC += 2;
 	return;
 }
 
 void instruction_jump_offset(Memory *memory, u16 raw_address) {
-    u16 address = ((raw_address << 8 | raw_address >> 8) & 0xfff) + memory->V[0];
+    u16 address = (raw_address & 0xfff) + memory->V[0];
     memory->PC = address;
 	return;
 }
@@ -308,47 +309,86 @@ void instruction_draw_sprite(Memory *memory, SDL_Renderer *renderer, u8 index_x,
 	return;
 }
 
-void instruction_skip_key_pressed() {
+void instruction_skip_key_pressed(Memory *memory, u8 index) {
+    SDL_Event event;
+    SDL_PollEvent(&event);
+    if (window_translate_key(&event) == memory->V[index])
+        memory->PC += 2;
+    memory->PC += 2;
 	return;
 }
 
-void instruction_skip_key_not_pressed() {
+void instruction_skip_key_not_pressed(Memory *memory, u8 index) {
+    SDL_Event event;
+    SDL_PollEvent(&event);
+    if (window_translate_key(&event) != memory->V[index])
+        memory->PC += 2;
+    memory->PC += 2;
 	return;
 }
 
-void instruction_store_BCD() {
+void instruction_store_BCD(Memory *memory, u8 index) {
+    u8 value = memory->V[index];
+    u8 hundreds = (u8)(value / 100);
+    u8 tens = (u8)(value / 10) - hundreds * 10;
+    u8 ones = value % 10;
+
+    memory->RAM[memory->I] = hundreds;
+    memory->RAM[memory->I + 1] = tens;
+    memory->RAM[memory->I + 2] = ones;
+    memory->PC += 2;
 	return;
 }
 
-void instruction_set_DT_reg() {
+void instruction_set_DT_reg(Memory *memory, u8 index) {
+    memory->DT = memory->V[index];
+    memory->PC += 2;
 	return;
 }
 
-void instruction_store_regs() {
+void instruction_store_regs(Memory *memory, u8 amount) {
+    memcpy(memory->RAM + memory->I, memory->V, amount + 1);
+    memory->PC += 2;
 	return;
 }
 
-void instruction_read_regs() {
+void instruction_read_regs(Memory *memory, u8 amount) {
+    memcpy(memory->V, memory->RAM + memory->I, amount + 1);
+    memory->PC += 2;
 	return;
 }
 
-void instruction_set_reg_DT() {
+void instruction_set_reg_DT(Memory *memory, u8 index) {
+    memory->V[index] = memory->DT;
+    memory->PC += 2;
 	return;
 }
 
-void instruction_set_ST_reg() {
+void instruction_set_ST_reg(Memory *memory, u8 index) {
+    memory->ST = memory->V[index];
+    memory->PC += 2;
 	return;
 }
 
-void instruction_set_I_reg() {
+void instruction_set_I_reg(Memory *memory, u8 index) {
+    memory->I = memory->V[index];
+    memory->PC += 2;
 	return;
 }
 
-void instruction_wait_for_key() {
+void instruction_wait_for_key(Memory *memory, u8 index) {
+    SDL_Event event;
+    SDL_PollEvent(&event);
+    while (event.type != SDL_KEYDOWN)
+        SDL_PollEvent(&event);
+    memory->V[index] = window_translate_key(&event);
+    memory->PC += 2;
 	return;
 }
 
- void instruction_add_I_reg() {
+ void instruction_add_I_reg(Memory *memory, u8 index) {
+    memory->I += memory->V[index];
+    memory->PC += 2;
 	return;
 }
 

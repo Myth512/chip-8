@@ -14,6 +14,8 @@ int main(int argc, char *argv[]) {
 
         u16 instruction = instruction_fetch(&memory);
         instruction_decode(instruction, &memory, renderer, &state);
+        instruction_update_timers(&memory);
+
     }
 
     window_destroy(window, renderer);

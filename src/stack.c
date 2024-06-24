@@ -10,6 +10,6 @@ bool stack_push(Stack *stack, u16 element) {
 u16 stack_pop(Stack *stack) {
     if (!stack->top)
         return false;
-    return stack->elements[stack->top--];
+    return stack->elements[--stack->top];
 }
 
