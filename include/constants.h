@@ -7,5 +7,6 @@
 #define BASE_ADDRESS 0x200
 #define INSTRUCTION_SIZE 2
 #define STACK_SIZE 128
+#define TARGET_FREQUENCY 540
 
 #endif

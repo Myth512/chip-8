@@ -3,6 +3,9 @@
 
 #include <SDL2/SDL.h>
 #include <stdbool.h>
+#include <unistd.h>
+#include <time.h>
+
 #include "memory.h"
 #include "constants.h"
 
@@ -19,5 +22,7 @@ void window_draw_sprite(Memory *memory, SDL_Renderer *renderer, u8 x, u8 y, u8 h
 void window_clear(SDL_Renderer *renderer);
 
 void window_setup(Memory *memory, SDL_Window **window, SDL_Renderer **renderer, bool *state);
+
+void window_sleep(time_t start, time_t end);
 
 #endif

@@ -114,3 +114,13 @@ void window_setup(Memory *memory, SDL_Window **window, SDL_Renderer **renderer, 
 		window_clear(*renderer);
 	return;
 }
+
+void window_sleep(time_t start, time_t end)
+{
+	double cycle_time = 1.0 / TARGET_FREQUENCY;
+	double work_time = (double)(end - start) / CLOCKS_PER_SEC;
+	double sleep_time = (cycle_time - work_time) * 1E6;
+	if (sleep_time > 0)
+		usleep(sleep_time);
+	return;
+}
