@@ -19,7 +19,8 @@ const u8 font[] = {
     0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-void memory_initialize(Memory *memory){
+void memory_initialize(Memory *memory)
+{
     memset(memory, 0, sizeof(Memory));
 
     memcpy(memory->RAM + 0x50, font, 80);
@@ -28,15 +29,18 @@ void memory_initialize(Memory *memory){
 	return;
 }
 
-void memory_rom_read(int argc, char *argv[], Memory *memory, bool *state){
-	if (argc < 2){
+void memory_rom_read(int argc, char *argv[], Memory *memory, bool *state)
+{
+	if (argc < 2)
+    {
 		fprintf(stderr, "Rom file is not provided.\n");	
 		*state = false;
 		return;
 	}
 
 	FILE *file = fopen(argv[1], "rb");
-	if (!file){
+	if (!file)
+    {
 		fprintf(stderr, "Could not read rom.\n");
 		*state = false;
 		return;

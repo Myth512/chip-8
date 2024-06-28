@@ -10,7 +10,8 @@
 
 extern const u8 font[80];
 
-typedef struct Memory{
+typedef struct Memory
+{
 	u8 RAM[4096];
 	u8 screen[32][64];
 	u16 PC;

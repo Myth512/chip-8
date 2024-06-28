@@ -6,6 +6,8 @@
 #include "memory.h"
 #include "constants.h"
 
+extern const int key_bindings[16];
+
 bool window_initialize(SDL_Window **window, SDL_Renderer **renderer);
 
 void window_destroy(SDL_Window *window, SDL_Renderer *renderer);
@@ -17,7 +19,5 @@ void window_draw_sprite(Memory *memory, SDL_Renderer *renderer, u8 x, u8 y, u8 h
 void window_clear(SDL_Renderer *renderer);
 
 void window_setup(Memory *memory, SDL_Window **window, SDL_Renderer **renderer, bool *state);
-
-u8 window_translate_key(SDL_Event *event);
 
 #endif
