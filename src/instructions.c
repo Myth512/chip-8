@@ -414,6 +414,15 @@ void instruction_set_I_reg(Memory *memory, u8 index)
 
 void instruction_wait_for_key(Memory *memory, u8 index)
 {
+	const Uint8 *key_states = SDL_GetKeyboardState(NULL);
+	for (int i = 0; i < 16; i++)
+	{
+		if (key_states[key_bindings[i]])
+		{
+			memory->V[index] = i;
+			memory->PC += 2;
+		}
+	}
 	return;
 }
 
