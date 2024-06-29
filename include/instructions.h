@@ -15,6 +15,8 @@ u16 instruction_fetch(Memory *memory);
 
 void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer, bool *state);
 
+void instruction_execute(Memory *memory, SDL_Renderer *renderer, bool *state, clock_t *last_instruction_executed);
+
 void instruction_clean(Memory *memory, SDL_Renderer *renderer);
 
 void instruction_return(Memory *memory);
@@ -83,5 +85,5 @@ void instruction_wait_for_key(Memory *memory, u8 index);
 
 void instruction_add_I_reg(Memory *memory, u8 index);
 
-void instruction_update_timers(Memory *memory);
+void instruction_update_timers(Memory *memory, clock_t *last_timer_update);
 #endif

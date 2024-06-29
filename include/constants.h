@@ -1,12 +1,13 @@
 #ifndef CONSTANT
 #define CONSTANT
 
-#define SCALE 27
+#define SCALE 20
 #define WINDOW_WIDTH 64 * SCALE
 #define WINDOW_HEIGHT 32 * SCALE
 #define BASE_ADDRESS 0x200
 #define INSTRUCTION_SIZE 2
 #define STACK_SIZE 128
-#define TARGET_FREQUENCY 100
+#define CPU_FREQUENCY 1000
+#define TIMER_FREQUENCY 60
 
 #endif

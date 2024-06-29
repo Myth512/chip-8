@@ -1,6 +1,6 @@
 #include "../include/window.h"
 
-const int key_bindings[] = { 
+const int key_bindings[] = {
 	SDL_SCANCODE_X, // 0
 	SDL_SCANCODE_1, // 1
 	SDL_SCANCODE_2, // 2
@@ -16,12 +16,13 @@ const int key_bindings[] = {
 	SDL_SCANCODE_4, // C
 	SDL_SCANCODE_R, // D
 	SDL_SCANCODE_F, // E
-	SDL_SCANCODE_V  // F
+	SDL_SCANCODE_V	// F
 };
 
 bool window_initialize(SDL_Window **window, SDL_Renderer **renderer)
 {
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+	{
 		fprintf(stderr, "Could not initialize SDL: \n%s", SDL_GetError());
 		return false;
 	}
@@ -32,8 +33,7 @@ bool window_initialize(SDL_Window **window, SDL_Renderer **renderer)
 		0,
 		WINDOW_WIDTH,
 		WINDOW_HEIGHT,
-		0	
-	);
+		0);
 
 	if (!*window)
 	{
@@ -47,7 +47,7 @@ bool window_initialize(SDL_Window **window, SDL_Renderer **renderer)
 		fprintf(stderr, "Could not create renderer.\n");
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -64,24 +64,27 @@ void window_process_input(bool *state)
 	SDL_Event event;
 	SDL_PollEvent(&event);
 
-	switch (event.type) {
-		case SDL_QUIT:
+	switch (event.type)
+	{
+	case SDL_QUIT:
+		*state = false;
+		break;
+	case SDL_KEYDOWN:
+		if (event.key.keysym.sym == SDLK_ESCAPE)
 			*state = false;
-			break;	
-		case SDL_KEYDOWN:
-			if (event.key.keysym.sym == SDLK_ESCAPE)
-				*state = false;
-			break;
+		break;
 	}
 	return;
 }
 
 void window_draw_sprite(Memory *memory, SDL_Renderer *renderer, u8 origin_x, u8 origin_y, u8 height)
 {
-    for (u8 y = 0; y < height; y++){
-        for (u8 x = 0; x < 8; x++){
-            u8 real_x = (origin_x + x) & 63;
-            u8 real_y = (origin_y + y) & 31;
+	for (u8 y = 0; y < height; y++)
+	{
+		for (u8 x = 0; x < 8; x++)
+		{
+			u8 real_x = (origin_x + x) & 63;
+			u8 real_y = (origin_y + y) & 31;
 
 			if (memory->screen[real_y][real_x])
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -93,17 +96,17 @@ void window_draw_sprite(Memory *memory, SDL_Renderer *renderer, u8 origin_x, u8 
 		}
 	}
 	SDL_RenderPresent(renderer);
-    return;
+	return;
 }
-    
+
 void window_clear(SDL_Renderer *renderer)
 {
-    SDL_RenderClear(renderer);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_Rect rect = { 0, 0, 64 * SCALE, 32 * SCALE};
-    SDL_RenderFillRect(renderer, &rect);
-    SDL_RenderPresent(renderer);
-    return;
+	SDL_RenderClear(renderer);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_Rect rect = {0, 0, 64 * SCALE, 32 * SCALE};
+	SDL_RenderFillRect(renderer, &rect);
+	SDL_RenderPresent(renderer);
+	return;
 }
 
 void window_setup(Memory *memory, SDL_Window **window, SDL_Renderer **renderer, bool *state)
@@ -112,15 +115,5 @@ void window_setup(Memory *memory, SDL_Window **window, SDL_Renderer **renderer, 
 	*state = window_initialize(window, renderer);
 	if (state)
 		window_clear(*renderer);
-	return;
-}
-
-void window_sleep(time_t start, time_t end)
-{
-	double cycle_time = 1.0 / TARGET_FREQUENCY;
-	double work_time = (double)(end - start) / CLOCKS_PER_SEC;
-	double sleep_time = (cycle_time - work_time) * 1E6;
-	if (sleep_time > 0)
-		usleep(sleep_time);
 	return;
 }

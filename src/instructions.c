@@ -151,10 +151,24 @@ void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer,
 	return;
 }
 
+void instruction_execute(Memory *memory, SDL_Renderer *renderer, bool *state, clock_t *last_instruction_executed)
+{
+	clock_t current_tick = clock(); 
+	clock_t delta_clock = current_tick - *last_instruction_executed; 
+	double delta_time = (double)delta_clock / CLOCKS_PER_SEC;
+	if (delta_time >= 1.0 / CPU_FREQUENCY)
+	{
+		u16 instruction = instruction_fetch(memory);
+		instruction_decode(instruction, memory, renderer, state);
+		*last_instruction_executed = clock();
+	}
+	return;
+}
+
 void instruction_clean(Memory *memory, SDL_Renderer *renderer)
 {
     memset(memory->screen, 0, 64 * 32);
-    window_clear(renderer);
+	window_clear(renderer);
     memory->PC += 2;
 	return;
 }
@@ -333,7 +347,7 @@ void instruction_draw_sprite(Memory *memory, SDL_Renderer *renderer, u8 index_x,
 			*screen_pixel ^= sprite_pixel;
         }
     }
-    window_draw_sprite(memory, renderer, origin_x, origin_y, height);
+	window_draw_sprite(memory, renderer, origin_x, origin_y, height);
     memory->PC += 2;
 	return;
 }
@@ -433,11 +447,18 @@ void instruction_wait_for_key(Memory *memory, u8 index)
 	return;
 }
 
-void instruction_update_timers(Memory *memory)
+void instruction_update_timers(Memory *memory, clock_t *last_timer_update)
 {
-    if (memory->DT)
-        memory->DT--;
-    if (memory->ST)
-        memory->ST--;
-    return;
+	clock_t current_tick = clock(); 
+	clock_t delta_clock = current_tick - *last_timer_update; 
+	double delta_time = (double)delta_clock / CLOCKS_PER_SEC;
+	if (delta_time >= 1.0 / TIMER_FREQUENCY)
+	{
+		if (memory->DT > 0)
+			memory->DT--;
+		if (memory->ST > 0)
+			memory->ST--;
+		*last_timer_update = clock();
+	}
+	return;
 }
