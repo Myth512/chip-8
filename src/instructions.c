@@ -422,7 +422,7 @@ void instruction_set_ST_reg(Memory *memory, u8 index)
 
 void instruction_set_I_reg(Memory *memory, u8 index)
 {
-    memory->I = memory->V[index];
+    memory->I = FONT_OFFSET + memory->V[index] * 5;
     memory->PC += 2;
 	return;
 }
