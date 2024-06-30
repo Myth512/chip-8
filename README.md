@@ -35,7 +35,7 @@ or
 
 Currently only way to change settings is to change macros in /include/constants.h and recompile project.
 
-* To change resolution adjust SCALE, new resolution is 64$*$SCALE $\times$ 32$*$SCALE.
+* To change resolution adjust SCALE, new resolution is 64*SCALE x 32*SCALE.
 * There are 5 color themes, to change just define one of them.
 ![Themes showcase](images/themes.jpg)
 
