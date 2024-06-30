@@ -2,12 +2,59 @@
 #define CONSTANT
 
 #define SCALE 20
+#define THEME_RETRO_ORANGE
+#define CPU_FREQUENCY 540
+#define TIMER_FREQUENCY 60
+
+#define BASE_ADDRESS 0x200
+#define FONT_OFFSET 0x0
+#define STACK_SIZE 256
 #define WINDOW_WIDTH 64 * SCALE
 #define WINDOW_HEIGHT 32 * SCALE
-#define BASE_ADDRESS 0x200
-#define INSTRUCTION_SIZE 2
-#define STACK_SIZE 128
-#define CPU_FREQUENCY 1000
-#define TIMER_FREQUENCY 60
+
+#ifdef THEME_WHITE_BLACK
+#define PIXEL_ON_RED 0xFF
+#define PIXEL_ON_GREEN 0xFF
+#define PIXEL_ON_BLUE 0xFF
+#define PIXEL_OFF_RED 0x00
+#define PIXEL_OFF_GREEN 0x00
+#define PIXEL_OFF_BLUE 0x00
+#endif
+
+#ifdef THEME_RETRO_ORANGE
+#define PIXEL_ON_RED 0xDD
+#define PIXEL_ON_GREEN 0x84
+#define PIXEL_ON_BLUE 0x21
+#define PIXEL_OFF_RED 0x1E
+#define PIXEL_OFF_GREEN 0x14
+#define PIXEL_OFF_BLUE 0x0A
+#endif
+
+#ifdef THEME_RETRO_GREEN
+#define PIXEL_ON_RED 0xD3
+#define PIXEL_ON_GREEN 0xFF
+#define PIXEL_ON_BLUE 0x86
+#define PIXEL_OFF_RED 0x12
+#define PIXEL_OFF_GREEN 0x18
+#define PIXEL_OFF_BLUE 0x0D
+#endif
+
+#ifdef THEME_BLUE_YELLOW
+#define PIXEL_ON_RED 0xFF
+#define PIXEL_ON_GREEN 0xFF
+#define PIXEL_ON_BLUE 0xCC
+#define PIXEL_OFF_RED 0x00
+#define PIXEL_OFF_GREEN 0x00
+#define PIXEL_OFF_BLUE 0x34
+#endif
+
+#ifdef THEME_BLUE_WHITE
+#define PIXEL_ON_RED 0xAD
+#define PIXEL_ON_GREEN 0xCD
+#define PIXEL_ON_BLUE 0xFF
+#define PIXEL_OFF_RED 0x00
+#define PIXEL_OFF_GREEN 0x0F
+#define PIXEL_OFF_BLUE 0x20
+#endif
 
 #endif

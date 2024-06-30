@@ -23,7 +23,7 @@ void memory_initialize(Memory *memory)
 {
     memset(memory, 0, sizeof(Memory));
 
-    memcpy(memory->RAM + 0x50, font, 80);
+    memcpy(memory->RAM + FONT_OFFSET, font, 80);
 
 	memory->PC = BASE_ADDRESS;
 	return;

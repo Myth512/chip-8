@@ -3,7 +3,7 @@
 u16 instruction_fetch(Memory *memory)
 {
 	u16 instruction;
-	memcpy(&instruction, memory->RAM + memory->PC, INSTRUCTION_SIZE);
+	memcpy(&instruction, memory->RAM + memory->PC, 2);
     instruction = (instruction << 8 | instruction >> 8);
 	return instruction;
 }

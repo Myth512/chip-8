@@ -1,8 +1,9 @@
 ## Screenshots
 
-![IBM Logo](images/IBM.png)
-_text editor_
-![vi](images/vi.png)
+![Astro Dodge](images/astro.png)
+_Astro Dodge_
+![vi](images/pong.png)
+_Pong_
 
 ## Requirements
 
@@ -30,10 +31,17 @@ or
 
 ```
 
+## Settings
+
+Currently only way to change settings is to change macros in /include/constants.h and recompile project.
+
+* To change resolution adjust SCALE, new resolution is 64$*$SCALE $\times$ 32$*$SCALE.
+* There are 5 color themes, to change just define one of them.
+![Themes showcase](images/themes.jpg)
+
 ## Improvements
 
 * Add sound
 * Enhance UI
-* Add color themes
 * Fix flickering
-* Add settings
+* Add normal settings
