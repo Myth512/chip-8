@@ -2,7 +2,7 @@
 #define CONSTANT
 
 #define SCALE 20
-#define THEME_RETRO_ORANGE
+#define THEME_BLUE_WHITE
 #define CPU_FREQUENCY 540
 #define TIMER_FREQUENCY 60
 
