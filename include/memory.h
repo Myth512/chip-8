@@ -24,6 +24,6 @@ typedef struct Memory
 
 void memory_initialize(Memory *memory);
 
-void memory_rom_read(int argc, char *argv[], Memory *memory, bool *state);
+bool memory_rom_read(int argc, char *argv[], Memory *memory);
 
 #endif

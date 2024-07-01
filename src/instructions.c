@@ -453,9 +453,11 @@ void instruction_update_timers(Memory *memory)
 			memory->DT--;
 		if (memory->ST > 0)
 		{
-			printf("BEEP\n");
+			SDL_PauseAudio(0);
 			memory->ST--;
 		}
+		else
+			SDL_PauseAudio(1);
 		last_timer_update = clock();
 	}
 	return;

@@ -5,10 +5,12 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "types.h"
 #include "constants.h"
 #include "memory.h"
 #include "window.h"
+#include "sound.h"
 #include "stack.h"
 
 u16 instruction_fetch(Memory *memory);

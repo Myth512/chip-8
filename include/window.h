@@ -22,5 +22,4 @@ void window_clear(SDL_Renderer *renderer);
 
 void window_render(Memory *memory, SDL_Renderer *renderer, clock_t *last_render);
 
-void window_setup(Memory *memory, SDL_Window **window, SDL_Renderer **renderer, bool *state);
 #endif

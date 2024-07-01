@@ -3,6 +3,7 @@
 
 #define SCALE 20
 #define THEME_BLUE_WHITE
+#define VOLUME 75
 #define CPU_FREQUENCY 540
 #define TIMER_FREQUENCY 60
 

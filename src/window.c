@@ -21,7 +21,7 @@ const int key_bindings[] = {
 
 bool window_initialize(SDL_Window **window, SDL_Renderer **renderer)
 {
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
 		fprintf(stderr, "Could not initialize SDL: \n%s", SDL_GetError());
 		return false;
@@ -106,14 +106,5 @@ void window_clear(SDL_Renderer *renderer)
 	SDL_Rect rect = {0, 0, 64 * SCALE, 32 * SCALE};
 	SDL_RenderFillRect(renderer, &rect);
 	SDL_RenderPresent(renderer);
-	return;
-}
-
-void window_setup(Memory *memory, SDL_Window **window, SDL_Renderer **renderer, bool *state)
-{
-	memory_initialize(memory);
-	*state = window_initialize(window, renderer);
-	if (state)
-		window_clear(*renderer);
 	return;
 }

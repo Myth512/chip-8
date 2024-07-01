@@ -29,21 +29,19 @@ void memory_initialize(Memory *memory)
 	return;
 }
 
-void memory_rom_read(int argc, char *argv[], Memory *memory, bool *state)
+bool memory_rom_read(int argc, char *argv[], Memory *memory)
 {
 	if (argc < 2)
     {
 		fprintf(stderr, "Rom file is not provided.\n");	
-		*state = false;
-		return;
+		return false;
 	}
 
 	FILE *file = fopen(argv[1], "rb");
 	if (!file)
     {
 		fprintf(stderr, "Could not read rom.\n");
-		*state = false;
-		return;
+		return false;
 	}
 	
 	fseek(file, 0, SEEK_END);
@@ -51,5 +49,5 @@ void memory_rom_read(int argc, char *argv[], Memory *memory, bool *state)
 	fseek(file, 0, SEEK_SET);
 	
 	fread(memory->RAM + BASE_ADDRESS, 8, size, file);
-	return;
+	return true;
 }	
