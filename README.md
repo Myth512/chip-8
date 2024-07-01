@@ -2,8 +2,8 @@
 
 ![Astro Dodge](images/astro.png)
 _Astro Dodge_
-![vi](images/pong.png)
-_Pong_
+![Space Invaders](images/space.png)
+_Space Invaders_
 
 ## Requirements
 
@@ -35,13 +35,14 @@ or
 
 Currently only way to change settings is to change macros in /include/constants.h and recompile project.
 
-* To change resolution adjust SCALE, new resolution is 64*SCALE x 32*SCALE.
+* To change resolution adjust SCALE
+* To change volume adjust VOLUME
 * There are 5 color themes, to change just define one of them.
 ![Themes showcase](images/themes.jpg)
 
 ## Improvements
 
-* Add sound
+* Implement Super CHIP-48 instructions
 * Enhance UI
-* Fix flickering
 * Add normal settings
+* Fix flickering
