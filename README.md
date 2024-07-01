@@ -1,6 +1,6 @@
 ## Screenshots
 
-![Astro Dodge](images/astro dodge.png)
+![Astro Dodge](images/astro%20dodge.png)
 _Astro Dodge_
 ![Space Invaders](images/space.png)
 _Space Invaders_
