@@ -13,7 +13,8 @@ extern const u8 font[80];
 typedef struct Memory
 {
 	u8 RAM[4096];
-	u8 screen[32][64];
+	u8 screen[64][128];
+	bool high_res;
 	u16 PC;
 	u16 I;
 	u8 DT;

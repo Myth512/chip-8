@@ -17,9 +17,6 @@ void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer,
 	u8 third_nibble = second_byte >> 4;
 	u8 fourth_nibble = instruction & 0xf;
 
-	if (!instruction)
-		return;
-
 	switch (first_nibble)
 	{
 	case 0x0:
@@ -29,7 +26,13 @@ void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer,
 			instruction_clean(memory, renderer);
 			break;
 		case 0xE:
-			instruction_return(memory);
+			if (third_nibble != 0xF)
+				instruction_return(memory);
+			else
+				instruction_low_res(memory);
+			break;
+		case 0xF:
+		 	instruction_high_res(memory);
 			break;
 		}
 		break;
@@ -102,15 +105,10 @@ void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer,
 		instruction_draw_sprite(memory, renderer, second_nibble, third_nibble, fourth_nibble);
 		break;
 	case 0xE:
-		switch (fourth_nibble)
-		{
-		case 0xE:
+	 	if (fourth_nibble == 0xE)
 			instruction_skip_key_pressed(memory, second_nibble);
-			break;
-		case 0x1:
+		else
 			instruction_skip_key_not_pressed(memory, second_nibble);
-			break;
-		}
 		break;
 	case 0xF:
 		switch (fourth_nibble)
@@ -170,8 +168,7 @@ void instruction_execute(Memory *memory, SDL_Renderer *renderer, bool *state)
 
 void instruction_clean(Memory *memory, SDL_Renderer *renderer)
 {
-	memset(memory->screen, 0, 64 * 32);
-	window_clear(renderer);
+	memset(memory->screen, 0, 128 * 64);
 	memory->PC += 2;
 	return;
 }
@@ -182,7 +179,19 @@ void instruction_return(Memory *memory)
 	return;
 }
 
-void instruction_jump(Memory *memory, u16 raw_address)
+void instruction_high_res(Memory *memory)
+{
+	memory->high_res = 1;
+	memory->PC += 2;
+}
+
+void instruction_low_res(Memory *memory)
+{
+	memory->high_res = 0;
+	memory->PC += 2;
+}
+
+ void instruction_jump(Memory *memory, u16 raw_address)
 {
 	u16 address = raw_address & 0xfff;
 	memory->PC = address;
@@ -325,29 +334,90 @@ void instruction_random(Memory *memory, u8 index, u8 value)
 	return;
 }
 
-void instruction_draw_sprite(Memory *memory, SDL_Renderer *renderer, u8 index_x, u8 index_y, u8 height)
+static void draw_low_res_sprite(Memory *memory, SDL_Renderer *renderer, u8 origin_x, u8 origin_y, u8 height)
 {
-	u8 origin_x = memory->V[index_x] & 63;
-	u8 origin_y = memory->V[index_y] & 31;
-	memory->V[15] = 0;
-	for (u8 y = 0; y < height; y++)
+	for (u8 row = 0, y; row < height; row++)
 	{
-		for (u8 x = 0; x < 8; x++)
+		y = (origin_y + row) * 2;
+		if (y >= 64)
+			continue;
+
+		for (u8 col = 0, x; col < 8; col++)
 		{
-			u8 real_x = (origin_x + x);
-			u8 real_y = (origin_y + y);
-			if (real_x < 64 && real_y < 32)
-			{
-				u8 *screen_pixel = &memory->screen[real_y][real_x];
-				u8 sprite_pixel = (bool)(memory->RAM[memory->I + y] & (128 >> x));
-				memory->V[15] |= *screen_pixel & sprite_pixel;
-				*screen_pixel ^= sprite_pixel;
-			}
+			x = (origin_x + col) * 2;
+			if (x >= 128)
+				continue;
+
+			u8 sprite_pixel = (bool)(memory->RAM[memory->I + row] & (128 >> col));
+			memory->V[15] |= memory->screen[y][x] & sprite_pixel;
+
+			memory->screen[y][x] ^= sprite_pixel;
+			memory->screen[y][x + 1] ^= sprite_pixel;
+			memory->screen[y + 1][x] ^= sprite_pixel;
+			memory->screen[y + 1][x + 1] ^= sprite_pixel;
 		}
 	}
-	window_draw_sprite(memory, renderer, origin_x, origin_y, height);
+}
+
+static void draw_high_res_sprite(Memory *memory, SDL_Renderer *renderer, u8 origin_x, u8 origin_y, u8 height)
+{
+	for (u8 row = 0, y; row < height; row++)
+	{
+		y = origin_y + row;
+		if (y >= 64)
+			continue;
+
+		for (u8 col = 0, x; col < 8; col++)
+		{
+			x = origin_x + col;
+			if (x >= 128)
+				continue;
+
+			u8 sprite_pixel = (bool)(memory->RAM[memory->I + row] & (128 >> col));
+			memory->V[15] |= memory->screen[y][x] & sprite_pixel;
+
+			memory->screen[y][x] ^= sprite_pixel;
+		}
+	}
+}
+
+static void draw_big_sprite(Memory *memory, SDL_Renderer *renderer, u8 origin_x, u8 origin_y) 
+{
+	for (u8 row = 0, y; row < 16; row++)
+	{
+		y = origin_y + row;
+		if (y >= 64)
+			continue;
+
+		for (u8 col = 0, x; col < 16; col++)
+		{
+			x = origin_x + col;
+			if (x >= 128)
+				continue;
+
+			u8 sprite_pixel = (bool)(memory->RAM[memory->I + row * 2] & (128 >> (col % 8)));
+			memory->V[15] |= memory->screen[y][x] & sprite_pixel;
+
+			memory->screen[y][x] ^= sprite_pixel;
+		}
+	}
+}
+
+void instruction_draw_sprite(Memory *memory, SDL_Renderer *renderer, u8 index_x, u8 index_y, u8 height)
+{
+	u8 origin_x = memory->V[index_x];
+	u8 origin_y = memory->V[index_y];
+	memory->V[15] = 0;
+	if (height)
+	{
+		if(memory->high_res)
+			draw_high_res_sprite(memory, renderer, origin_x, origin_y, height);
+		else
+			draw_low_res_sprite(memory, renderer, origin_x, origin_y, height);
+	}
+	else
+		draw_big_sprite(memory, renderer, origin_x, origin_y);
 	memory->PC += 2;
-	return;
 }
 
 void instruction_skip_key_pressed(Memory *memory, u8 index)

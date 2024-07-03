@@ -23,6 +23,10 @@ void instruction_clean(Memory *memory, SDL_Renderer *renderer);
 
 void instruction_return(Memory *memory);
 
+void instruction_high_res(Memory *memory);
+
+void instruction_low_res(Memory *memory);
+
 void instruction_jump(Memory *memory, u16 raw_address);
 
 void instruction_call(Memory *memory, u16 raw_address);

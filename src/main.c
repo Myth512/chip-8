@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
         window_process_input(&state);
         instruction_execute(&memory, renderer, &state); 
         instruction_update_timers(&memory); 
+        window_render(&memory, renderer);
     }
     window_destroy(window, renderer);
     SDL_CloseAudio();

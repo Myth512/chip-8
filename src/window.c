@@ -83,8 +83,8 @@ void window_draw_sprite(Memory *memory, SDL_Renderer *renderer, u8 origin_x, u8 
 	{
 		for (u8 x = 0; x < 8; x++)
 		{
-			u8 real_x = (origin_x + x) & 63;
-			u8 real_y = (origin_y + y) & 31;
+			u8 real_x = (origin_x + x) & 127;
+			u8 real_y = (origin_y + y) & 63;
 
 			if (memory->screen[real_y][real_x])
 				SDL_SetRenderDrawColor(renderer, PIXEL_ON_RED, PIXEL_ON_GREEN, PIXEL_ON_BLUE, 255);
@@ -99,6 +99,24 @@ void window_draw_sprite(Memory *memory, SDL_Renderer *renderer, u8 origin_x, u8 
 	return;
 }
 
+void window_render(Memory *memory, SDL_Renderer *renderer)
+{
+	for (u8 y = 0; y < 64; y++)
+	{
+		for (u8 x = 0; x < 128; x++)
+		{
+			if (memory->screen[y][x])
+				SDL_SetRenderDrawColor(renderer, PIXEL_ON_RED, PIXEL_ON_GREEN, PIXEL_ON_BLUE, 255);
+			else
+				SDL_SetRenderDrawColor(renderer, PIXEL_OFF_RED, PIXEL_OFF_GREEN, PIXEL_OFF_BLUE, 255);
+
+			SDL_Rect pixel = {x * SCALE, y * SCALE, SCALE, SCALE};
+			SDL_RenderFillRect(renderer, &pixel);
+		}
+	}
+	SDL_RenderPresent(renderer);
+	return;
+}
 void window_clear(SDL_Renderer *renderer)
 {
 	SDL_RenderClear(renderer);
