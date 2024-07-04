@@ -27,6 +27,14 @@ void instruction_high_res(Memory *memory);
 
 void instruction_low_res(Memory *memory);
 
+void instruction_scroll_down(Memory *memory, u8 count);
+
+void instruction_scroll_right(Memory *memory);
+
+void instruction_scroll_left(Memory *memory);
+
+void instruction_exit(bool *state);
+
 void instruction_jump(Memory *memory, u16 raw_address);
 
 void instruction_call(Memory *memory, u16 raw_address);
@@ -75,17 +83,23 @@ void instruction_skip_key_not_pressed(Memory *memory, u8 index);
 
 void instruction_store_BCD(Memory *memory, u8 index);
 
+void instruction_set_I_large_font(Memory *memory, u8 index);
+
 void instruction_set_DT_reg(Memory *memory, u8 index);
 
 void instruction_store_regs(Memory *memory, u8 index);
 
 void instruction_read_regs(Memory *memory, u8 index);
 
+void instruction_save_regs(Memory *memory, u8 index);
+
+void instruction_load_regs(Memory *memory, u8 index);
+
 void instruction_set_reg_DT(Memory *memory, u8 index);
 
 void instruction_set_ST_reg(Memory *memory, u8 index);
 
-void instruction_set_I_reg(Memory *memory, u8 index);
+void instruction_set_I_font(Memory *memory, u8 index);
 
 void instruction_wait_for_key(Memory *memory, u8 index);
 
