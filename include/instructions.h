@@ -10,14 +10,14 @@
 #include "constants.h"
 #include "memory.h"
 #include "window.h"
-#include "sound.h"
+#include "audio.h"
 #include "stack.h"
 
 u16 instruction_fetch(Memory *memory);
 
-void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer, bool *state);
+void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer, SDL_AudioDeviceID audio_device, bool *state);
 
-void instruction_execute(Memory *memory, SDL_Renderer *renderer, bool *state);
+void instruction_execute(Memory *memory, SDL_Renderer *renderer, SDL_AudioDeviceID audio_device, bool *state);
 
 void instruction_clean(Memory *memory, SDL_Renderer *renderer);
 
@@ -97,7 +97,7 @@ void instruction_load_regs(Memory *memory, u8 index);
 
 void instruction_set_reg_DT(Memory *memory, u8 index);
 
-void instruction_set_ST_reg(Memory *memory, u8 index);
+void instruction_set_ST_reg(Memory *memory, SDL_AudioDeviceID audio_device, u8 index);
 
 void instruction_set_I_font(Memory *memory, u8 index);
 

@@ -20,7 +20,6 @@ typedef struct Memory
 	u16 PC;
 	u16 I;
 	u8 DT;
-	u8 ST;
 	u8 V[16];
 	u8 flags[16];
     Stack stack; 

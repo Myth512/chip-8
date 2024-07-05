@@ -8,6 +8,8 @@
 
 void audio_callback(void *userdata, Uint8 *stream, int len);
 
-bool sound_initialize(SDL_AudioSpec *audio_spec); 
+bool audio_initialize(SDL_AudioSpec *obtained_spec, SDL_AudioDeviceID *audio_device_ID);
+
+void audio_play(SDL_AudioDeviceID audio_device, double duration);
 
 #endif

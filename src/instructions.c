@@ -8,7 +8,7 @@ u16 instruction_fetch(Memory *memory)
 	return instruction;
 }
 
-void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer, bool *state)
+void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer, SDL_AudioDeviceID audio_device, bool *state)
 {
 	u8 second_byte = instruction;
 
@@ -156,7 +156,7 @@ void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer,
 			instruction_set_reg_DT(memory, second_nibble);
 			break;
 		case 0x8:
-			instruction_set_ST_reg(memory, second_nibble);
+			instruction_set_ST_reg(memory, audio_device, second_nibble);
 			break;
 		case 0x9:
 			instruction_set_I_font(memory, second_nibble);
@@ -172,7 +172,7 @@ void instruction_decode(u16 instruction, Memory *memory, SDL_Renderer *renderer,
 	}
 }
 
-void instruction_execute(Memory *memory, SDL_Renderer *renderer, bool *state)
+void instruction_execute(Memory *memory, SDL_Renderer *renderer, SDL_AudioDeviceID audio_device, bool *state)
 {
 	static clock_t last_instruction_executed = 0;
 	clock_t current_tick = clock();
@@ -181,7 +181,7 @@ void instruction_execute(Memory *memory, SDL_Renderer *renderer, bool *state)
 	if (delta_time >= 1.0 / CPU_FREQUENCY)
 	{
 		u16 instruction = instruction_fetch(memory);
-		instruction_decode(instruction, memory, renderer, state);
+		instruction_decode(instruction, memory, renderer, audio_device, state);
 		last_instruction_executed = clock();
 	}
 }
@@ -409,7 +409,6 @@ static void draw_high_res_sprite(Memory *memory, SDL_Renderer *renderer, u8 orig
 			u16 sprite_offset = memory->I + row;
 			bool sprite_pixel = memory->RAM[sprite_offset] & (128 >> col);
 			memory->V[15] |= memory->screen[y][x] & sprite_pixel;
-
 			memory->screen[y][x] ^= sprite_pixel;
 		}
 	}
@@ -484,6 +483,7 @@ void instruction_set_I_large_font(Memory *memory, u8 index)
 	memory->I = FONT_OFFSET + 80 + memory->V[index] * 10;
 	memory->PC += 2;
 }
+
 void instruction_set_DT_reg(Memory *memory, u8 index)
 {
 	memory->DT = memory->V[index];
@@ -520,9 +520,10 @@ void instruction_set_reg_DT(Memory *memory, u8 index)
 	memory->PC += 2;
 }
 
-void instruction_set_ST_reg(Memory *memory, u8 index)
+void instruction_set_ST_reg(Memory *memory, SDL_AudioDeviceID audio_device, u8 index)
 {
-	memory->ST = memory->V[index];
+	double duration = (double)memory->V[index] / TIMER_FREQUENCY;
+	audio_play(audio_device, duration);
 	memory->PC += 2;
 }
 
@@ -561,13 +562,6 @@ void instruction_update_timers(Memory *memory)
 	{
 		if (memory->DT > 0)
 			memory->DT--;
-		if (memory->ST > 0)
-		{
-			SDL_PauseAudio(0);
-			memory->ST--;
-		}
-		else
-			SDL_PauseAudio(1);
 		last_timer_update = clock();
 	}
 }

@@ -9,7 +9,7 @@
 
 #define BASE_ADDRESS 0x200
 #define FONT_OFFSET 0x0
-#define STACK_SIZE 256
+#define STACK_SIZE 32
 #define WINDOW_WIDTH 128 * SCALE
 #define WINDOW_HEIGHT 64 * SCALE
 

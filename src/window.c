@@ -117,11 +117,12 @@ void window_render(Memory *memory, SDL_Renderer *renderer)
 	SDL_RenderPresent(renderer);
 	return;
 }
+
 void window_clear(SDL_Renderer *renderer)
 {
 	SDL_RenderClear(renderer);
 	SDL_SetRenderDrawColor(renderer, PIXEL_OFF_RED, PIXEL_OFF_GREEN, PIXEL_OFF_BLUE, 255);
-	SDL_Rect rect = {0, 0, 64 * SCALE, 32 * SCALE};
+	SDL_Rect rect = {0, 0, 128 * SCALE, 64 * SCALE};
 	SDL_RenderFillRect(renderer, &rect);
 	SDL_RenderPresent(renderer);
 	return;
